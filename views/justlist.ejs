@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Liisi Loomets, veebiprogrammeerimine 2023</title>
+
+	<style>
+		body {
+			background-color:gainsboro;
+		}
+	</style>
+</head>
+
+<body>
+	<img src="/banner/banner.png" alt="Veebiprogrammeerimise kursuse bänner">
+	<h1><%= h1 %></h1>
+	<ul>
+		<!--Teeme ejs tsükli, mis käib läbi massiivi wisdom-->
+		<% wisdom.forEach(function(sentence){ %>
+			<li><%= sentence %></li>
+		<% }); %>
+	</ul>
+	<hr>
+	<ul>
+		<li><a href="/">Avalehele</a></li>
+	</ul>
+	<hr>
+</body>
+</html>
