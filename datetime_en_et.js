@@ -50,5 +50,16 @@ const timeOfDayET = function(){
 	return partOfDay;
 }
 
+const formatChange = function(engFormatDate){
+	let separated = [];
+	separated = engFormatDate.split(".");
+	let estDate = new Date();
+	let day = separated[1];
+	let month = separated[0];
+	let year = separated[2];
+	let estFormatDate = day + "." + month + "." + year;
+	return estFormatDate;
+}
+
 //ekspordin all
 module.exports = {dateETformatted: dateETformatted, timeETformatted: timeETformatted, timeOfDayET:timeOfDayET, monthsET:monthNamesET, dateENformatted:dateENformatted, timeENformatted:timeENformatted, dateENformattedShort:dateENformattedShort, monthsEN:monthNamesEN};

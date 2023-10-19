@@ -13,15 +13,12 @@
 
 <body>
 	<img src="/banner/banner.png" alt="Veebiprogrammeerimise kursuse bänner">
-	<h1><%= h1 %></h1>
-	<ol>
-		<!--Teeme ejs tsükli, mis käib läbi massiivi names-->
-		<% names.forEach(function(sentence){ %>     <!-- names tuleb index.js failist  /names, nendega ühendame failid-->
-			<li><%= sentence %></li>
-		<% }); %>
-	</ol>
+	<h1>Eesti film</h1>
+	
 	<hr>
 	<ul>
+		<li><a href="/eestifilm/filmiloend">Eesti filmide loend</a></li>
+		<li><a href="/eestifilm/addfilmperson">Eesti filmitegelase lisamine</a></li>
 		<li><a href="/">Avalehele</a></li>
 	</ul>
 	<hr>
