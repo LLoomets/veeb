@@ -106,12 +106,35 @@ app.post('/eestifilm/addfilmperson', (req, res)=>{
 });
 
 app.get('/eestifilm/singlefilm', (req, res)=>{
-    res.render('singlefilm');
+    let sql = 'SELECT COUNT(id) AS max FROM movie';
+    let sqlResult = [];
+    conn.query(sql, (err, result) => {
+        if (err) {
+            res.render('singlefilm');
+            throw err;
+        }
+        else {
+            res.render('singlefilm', {filmcount: result[0]['max']});
+        }
+    })
 });
 
 app.post('/eestifilm/singlefilm', (req, res)=>{
-    let max_value = 'SELECT COUNT(id) FROM movie';
-    let sql = 'SELECT FROM movie WHERE id=" "';
+    //console.log("POST");
+    let notice= '';
+    let sql = 'SELECT * FROM movie WHERE id=?';
+    let sqlResult = [];
+    conn.query(sql, [req.body.filmNumberInput], (err, result) => {
+        if (err) {
+            notice = 'Filmi andmed ei leitud!';
+            res.render('singlefilmlist', {filmdata: sqlResult, notice: notice});
+            throw err;
+        }
+        else {
+            notice = 'Film leitud!';
+            res.render('singlefilmlist', {filmdata: result, notice: notice});
+        }
+    });
 });
 
 

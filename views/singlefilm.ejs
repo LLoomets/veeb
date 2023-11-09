@@ -21,10 +21,14 @@
 		<li><a href="/">Avalehele</a></li>
 	</ul>
 	<hr>
-	<h3></h3>
+
+	<h2>Otsi filmi</h2>
 
 	<form method="POST">
-		
+		<label for="filmNumberInput">Filmi number listis</label>
+		<input type="number" name="filmNumberInput" id="filmNumberInput" min="1" max=<%= locals.filmcount %> required>
+		<br>
+		<input type="submit" name="filmNumberSubmit" value="Otsing">
 	</form>
 
 </body>
