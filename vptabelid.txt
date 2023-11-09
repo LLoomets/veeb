@@ -1,0 +1,3 @@
+Uudised
+
+CREATE TABLE `if23_liisi_lo`.`vpnews` (`id` INT(11) NOT NULL , `title` VARCHAR(140) NOT NULL , `content` VARCHAR(2000) NOT NULL , `added` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP , `expire` DATE NOT NULL , `userid` INT(11) NOT NULL , `delete` DATETIME NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB;
