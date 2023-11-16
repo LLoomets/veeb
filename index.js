@@ -5,10 +5,16 @@ const mysql = require('mysql2');
 const timeInfo = require('./datetime_en_et');
 const bodyparser = require('body-parser');
 const dbInfo = require('../../vp23config.js');
+//fotode laadimiseks
+const multer = require('multer');
+//seadistame vahevara (middleware), mis määrab üleslaadimise kataloogi
+const upload = multer({dest: '.public/gallery/orig/'});
+const sharp = require('sharp');
 
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
-app.use(bodyparser.urlencoded({extended: false}));
+//Järgnev, kui ainult tekst, siis 'false', kui ka muud kraami nt pilti, siis'true'
+app.use(bodyparser.urlencoded({extended: true}));
 
 //loon andmebaasiühenduse
 const conn = mysql.createConnection({
@@ -147,21 +153,110 @@ app.get('/news/add', (req, res)=> {
     
 });
 
-app.get('/news/read', (req, res)=> {
-    res.render('readnews');
-    
+app.post('/news/add', (req,res)=> {
+    let notice = '';
+    let sql = 'INSERT INTO vpnews (title, content, expire, userid) VALUES (?, ?, ?, 1)';
+    conn.query(sql,[req.body.titleInput, req.body.contentInput, req.body.expireInput], (err, result)=>{
+        if(err) {
+            notice = 'Uudise lisamine ebaõnnestus';
+            res.render('addnews', {notice: notice});
+            throw err;
+        }
+        else{
+            notice = 'Uudis on edukalt lisatud';
+            res.render('addnews', {notice: notice});
+        }
+    });
 });
+
+app.get('/news/read', (req, res)=> {
+    let sqlDate = timeInfo.dateSQLformatted();
+    let sql = 'SELECT * FROM vpnews WHERE expire >' + sqlDate + ' AND deleted IS NULL ORDER BY id DESC';
+    let sqlResult = [];
+    conn.query(sql, (err, result)=>{
+        if(err) {
+            res.render('readnews', {readnews: sqlResult, sqlDateNow: sqlDate});
+            throw err;
+        }
+        else {
+            console.log('loeme uudiseid');
+            //console.log(result);
+            res.render('readnews', {readnews: result, sqlDateNow: sqlDate});
+        }
+    });
+});
+
 
 app.get('/news/read/:id', (req, res)=> {
-    //res.render('readnews');
-    res.send('Tahame uudist, mille id on: ' + req.params.id);
+    let sql = 'SELECT * FROM vpnews WHERE id = ? AND deleted IS NULL ORDER BY id DESC';
+    let sqlResult = [];
+    conn.query(sql, [req.params.id], (err, result) => {
+        if (err) {
+            res.render('readnewsdata', {newsdata: sqlResult});
+            throw err;
+        }
+        else {
+            res.render('readnewsdata', {newsdata: result[0]});
+        }
+    });  
 });
 
-app.get('/news/read/:id/:lang', (req, res)=> {
+/* app.get('/news/read/:id/:lang', (req, res)=> {
     //res.render('readnews');
     console.log(req.params);
     console.log(req.query);
     res.send('Tahame uudist, mille id on: ' + req.params.id);
+}); */
+
+app.get('/photoupload', (req,res)=>{
+    res.render('photoupload');
 });
+
+app.post('/photoupload', upload.single('photoInput'), (req, res)=>{
+    let notice = '';
+	console.log(req.file);
+	console.log(req.body);
+    const fileName = 'vp_' + Date.now() + '.jpg';
+	/* fs.rename(req.file.path, './public/gallery/orig/' + req.file.originalname, (err)=>{
+		console.log('Faili laadimise viga: ' + err);
+	}); */
+    fs.rename(req.file.path, './public/gallery/orig/' + fileName, (err)=>{
+		console.log('Faili laadimise viga: ' + err);
+	});
+    //loome kaks väiksema mõõduga pildi varianti
+    sharp('./public/gallery/orig/' + fileName).resize(100,100).jpeg({quality : 90}).toFile('./public/gallery/thumbs/' + fileName);
+    sharp('./public/gallery/orig/' + fileName).resize(800,600).jpeg({quality : 90}).toFile('./public/gallery/normal/' + fileName);
+
+    //foto andmed andmetabelisse
+    let sql = 'INSERT INTO vpgallery (filename, originalname, alttext, privacy, userid) VALUES(?,?,?,?,?)';
+    const userid = 1;
+    conn.query(sql, [fileName, req.file.originalname, req.body.altInput, req.body.privacyInput, userid], (err, result)=>{
+        if (err) {
+            notice = 'Foto andmete salvestamine ebaõnnestus';
+            res.render('photoupload', {notice: notice});
+            throw err;
+        }
+        else {
+            notice = 'Foto ' + req.file.originalname + ' laeti edukalt üles!';
+            res.render('photoupload', {notice: notice});
+        }
+    });
+});
+
+//andmebaasist tuleb lugeda piltide id, filename ja alttext
+app.get('/photogallery', (req,res)=>{
+    let sql = 'SELECT * FROM vpgallery WHERE deleted IS NULL ORDER BY id DESC';
+    let sqlResult = [];
+    conn.query(sql, (err, result)=>{
+        if(err) {
+            res.render('photogallery', {photos: sqlResult});
+            throw err;
+        }
+        else {
+            res.render('photogallery', {photos: result});
+        }
+    }); 
+});
+
 
 app.listen(5110);

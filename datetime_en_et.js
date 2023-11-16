@@ -32,6 +32,13 @@ const timeETformatted = function(){
 	return timeET;
 }
 
+// SQL VORM
+
+const dateSQLformatted = function(){
+	let timeNow = new Date();
+	return timeNow.getFullYear() + "-" + (timeNow.getMonth()+1) + "-" + timeNow.getDay();
+}
+
 const timeOfDayET = function(){
 	let partOfDay = "suvaline hetk";
 	let hourNow  = new Date().getHours();
@@ -62,4 +69,4 @@ const formatChange = function(engFormatDate){
 }
 
 //ekspordin all
-module.exports = {dateETformatted: dateETformatted, timeETformatted: timeETformatted, timeOfDayET:timeOfDayET, monthsET:monthNamesET, dateENformatted:dateENformatted, timeENformatted:timeENformatted, dateENformattedShort:dateENformattedShort, monthsEN:monthNamesEN};
+module.exports = {dateETformatted: dateETformatted, timeETformatted: timeETformatted, timeOfDayET:timeOfDayET, monthsET:monthNamesET, dateENformatted:dateENformatted, timeENformatted:timeENformatted, dateENformattedShort:dateENformattedShort, monthsEN:monthNamesEN, dateSQLformatted: dateSQLformatted};
