@@ -4,6 +4,8 @@
 	<meta charset="utf-8">
 	<title>Liisi Loomets, veebiprogrammeerimine 2023</title>
 
+	<script src="/script/check.js" defer=""></script>
+
 	<style>
 		body {
 			background-color:gainsboro;
@@ -51,7 +53,8 @@
 		<label for="privacyInput3">Avalik (kõik näevad)</label>
 		<br>
 
-		<input type="submit" name="photoSubmit" value="Lae üles">
+		<input type="submit" name="photoSubmit" id="photoSubmit" value="Lae üles">
+		<span id="checkInfo"></span>
 	</form>
 	<p><%= locals.notice || 'Ootel!' %></p>
 </body>

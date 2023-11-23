@@ -10,6 +10,7 @@ const multer = require('multer');
 //seadistame vahevara (middleware), mis määrab üleslaadimise kataloogi
 const upload = multer({dest: '.public/gallery/orig/'});
 const sharp = require('sharp');
+const async = require('async');
 
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
@@ -70,6 +71,8 @@ app.get('/names', (req, res)=>{
 app.get('/eestifilm', (req, res)=>{
     res.render('filmindex');
 });
+
+
 
 app.get('/eestifilm/filmiloend', (req, res)=>{
     let sql = 'SELECT title, production_year, duration FROM movie';
@@ -141,6 +144,44 @@ app.post('/eestifilm/singlefilm', (req, res)=>{
             res.render('singlefilmlist', {filmdata: result, notice: notice});
         }
     });
+});
+
+app.get('/eestifilm/addfilmrelation', (req, res)=>{
+    //kasutades async moodulit paneme mitu tegevust paralleelselt tööle
+    //kõigepealt loome tegevuste loendi
+    const myQuerys = [
+        function(callback){
+            conn.execute('SELECT id, first_name, last_name FROM person', (err, result)=> {
+                if(err) {
+                    return callback(err);
+                }
+                else {
+                    return callback(null, result);
+                }
+            });
+        },
+        function(callback) {
+            conn.execute('SELECT id, title FROM movie', (err, result)=> {
+                if(err) {
+                    return callback(err);
+                }
+                else {
+                    return callback(null, result);
+                }
+            });
+        }// veel , ja järgmine function jne
+    ];
+    //paneme kõik need tegevused paralleelselt tööle, tulemuseks list (array) ühistest tulemustest
+    async.parallel(myQuerys, (err, results)=> {
+        if(err) {
+            throw err;
+        }
+        else {
+            //siin kõik asjad mis on vaja teha
+            console.log(results)
+        }
+    });
+    res.render('addfilmrelation')
 });
 
 app.get('/news', (req, res)=> {
@@ -230,7 +271,7 @@ app.post('/photoupload', upload.single('photoInput'), (req, res)=>{
     //foto andmed andmetabelisse
     let sql = 'INSERT INTO vpgallery (filename, originalname, alttext, privacy, userid) VALUES(?,?,?,?,?)';
     const userid = 1;
-    conn.query(sql, [fileName, req.file.originalname, req.body.altInput, req.body.privacyInput, userid], (err, result)=>{
+    conn.execute(sql, [fileName, req.file.originalname, req.body.altInput, req.body.privacyInput, userid], (err, result)=>{
         if (err) {
             notice = 'Foto andmete salvestamine ebaõnnestus';
             res.render('photoupload', {notice: notice});
@@ -247,12 +288,13 @@ app.post('/photoupload', upload.single('photoInput'), (req, res)=>{
 app.get('/photogallery', (req,res)=>{
     let sql = 'SELECT * FROM vpgallery WHERE deleted IS NULL ORDER BY id DESC';
     let sqlResult = [];
-    conn.query(sql, (err, result)=>{
+    conn.execute(sql, (err, result)=>{
         if(err) {
             res.render('photogallery', {photoList: sqlResult});
             throw err;
         }
         else {
+            //console.log(result)
             res.render('photogallery', {photoList: result});
         }
     }); 
