@@ -9,6 +9,13 @@
         body {
 			background-color:gainsboro;
 		}
+		a, a:visited {
+			text-decoration: none;
+		}
+
+		a:hover, a:active {
+			text-decoration: underline;
+		}
     </style>
 </head>
 <body>
@@ -21,9 +28,9 @@
 	<h2>Galerii</h2>
 	<div class="gallery">
 	
-		<% photos.forEach(function(photo) { %>
+		<% photoList.forEach(function(photo) { %>
 			<div class="thumbgallery">
-				<img src="gallery/thumbs/<%= photo.filename %>" alt="<%= photo.alttext %>" data-filename="<%= photo.filename %>" data-id="1" class="thumbs">
+				<img src="gallery/thumbs/<%= photo.filename %>" alt="<%if(photo.alttext != ''){%><%=photo.alttext%><%}else{%>Galeriipilt<%}%>" data-filename="<%= photo.filename %>" data-id="<%= photo.id %>" class="thumbs">
 				<p></p> 
 			</div>
 		<% }); %>

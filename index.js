@@ -249,11 +249,11 @@ app.get('/photogallery', (req,res)=>{
     let sqlResult = [];
     conn.query(sql, (err, result)=>{
         if(err) {
-            res.render('photogallery', {photos: sqlResult});
+            res.render('photogallery', {photoList: sqlResult});
             throw err;
         }
         else {
-            res.render('photogallery', {photos: result});
+            res.render('photogallery', {photoList: result});
         }
     }); 
 });
