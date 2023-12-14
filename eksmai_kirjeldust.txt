@@ -1,0 +1,30 @@
+väike veebirakendus 
+üks või mitu marsruuti
+andmebaasist väljastab/loeb midagi
+andmebaasi lisamine
+andmebaasiga suhtlemine - SQL
+SELECT, DELETE, UPDATE, INSERT
+
+ejs, views
+
+HTML elemendid
+
+veidi matemaatikat
+
+6 akadeemilist tundi. 4,5 tundi
+
+kasutame veeb kataloogi
+uued failid, võib kopeerida tükke vanadest töödest
+ülesandes võib olla juhis kasutada varasemat faili
+
+kui jõuad varem valmis, vaatab kohe läbi
+
+kasuta oma/kooli meili, võid lisada märkuseid
+faili .js asemel .txt meiliga saates(kui peab)
+
+(proovivad teha greeny kausta, kuhu laadida oma failid)
+
+
+
+SELECT..........LIMIT 3 - väljastab 3 tk
+		LIMIT 9,3 - tulemused 10 11 12, jätab 9 kohta vahele

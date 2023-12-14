@@ -21,12 +21,7 @@ const bcrypt = require('bcrypt');
 const session = require('express-session');
 
 //pildi tüübi jaoks (jpeg, png, gif)
-const fileType = require('file-type');
-
-const buffer = Buffer.from(/* file contents */);
-const result = fileType(buffer);
-
-console.log(result); // Outputs: { ext: 'jpg', mime: 'image/jpeg' }
+//import fileType from 'file-type';
 
 
 app.use(session({secret: 'minuAbsoluutseltSalajaneVõti', saveUninitialized: true, resave: true}));
