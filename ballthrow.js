@@ -49,33 +49,65 @@ app.get('/', (req, res)=>{
     res.render('ballthrow');
 });
 
-app.post('/', (req, res)=>{
+app.post('/', (req, res) => {
     let notice = '';
+    let selectSQL = 'SELECT participant_number, date, distance FROM competition WHERE participant_number = ? ORDER BY distance DESC';
     let insertSQL = 'INSERT INTO competition (participant_number, date, distance) VALUES (?,?,?)';
-
-    conn.execute(insertSQL,[req.body.participantNumInput, req.body.dateInput, req.body.throwDistanceInput], (err, result)=>{
-        if(err){
-            notice = 'Andmete lisamine ebaõnnestus';
-            res.render('ballthrow', {notice: notice});
+    let updateSQL = 'UPDATE competition SET distance = ? WHERE participant_number = ? AND date = ? AND distance < ?';
+    const resultInput = parseFloat(req.body.throwDistanceInput);
+    pool.getConnection((err, conn)=>{
+        if(err) {
             throw err;
-        }
-        else{
-            notice = 'Osaleja number ' + req.body.participantNumInput +  ' viskekaugusega ' + req.body.throwDistanceInput + ' meetrit lisamine õnnestus!';
-
-            let selectSQL = 'SELECT date, distance FROM competition WHERE participant_number = ? ORDERED BY distance DESC';
-            conn.execute(selectSQL, [req.body.participantNumInput, req.body.dateInput, req.body.throwDistanceInput], (err, result)=>{
-                if(err){
-                    console.log('no mida');
-                    res.render('ballthrow');
-                }
-                else{
-                    res.render('ballthrow',{notice: notice, ballthrow: result});
+            conn.release();
+        } else {
+            conn.execute(updateSQL, [resultInput, req.body.participantNumInput, req.body.dateInput, resultInput], (err, updateResult)=>{
+                if (err) {
+                    throw err;
+                    res.render('ballthrow', {notice: 'mingi error'});
+                } else {
+                    if(updateResult.affectedRows > 0) {
+                        conn.execute(selectSQL, [req.body.participantNumInput], (err, result)=>{
+                            if (err) {
+                                notice = 'Ei saa kuvada andmeid';
+                                res.render('singlethrow', {notice: notice});
+                            } else {
+                                if(result && result.length > 0) {
+                                    notice = 'Andmed edukalt kuvatud';
+                                    res.render('singlethrow', {playerInfo: result, notice:notice});
+                                } else {
+                                    notice = 'Võistleja puudub';
+                                    res.render('singlethrow', {notice:notice});
+                                }
+                            }
+                        });
+                    } else {
+                        conn.execute(insertSQL, [req.body.participantNumInput, req.body.dateInput, resultInput], (err, result) =>{
+                            if (err) {
+                                notice = 'Andmete salvestamine ebaõnnestus';
+                                res.render('ballthrow', {notice:notice});
+                                throw err;
+                            } else {
+                                conn.execute(selectSQL, [req.body.participantNumInput], (err, result)=>{
+                                    if (err) {
+                                        notice = 'Ei saa kuvada andmeid';
+                                        res.render('singlethrow', {notice:notice});
+                                    } else {
+                                        if (result && result.length > 0) {
+                                            notice = 'Andmed edukalt kuvatud';
+                                            res.render('singlethrow', {playerInfo: result, notice:notice});
+                                        } else {
+                                            notice = 'Võistlejat ei leitud';
+                                            res.render('singlethrow', {notice:notice});
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                    }
                 }
             });
-            
         }
-    });
-    
+    });    
 });
 
 

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Palliviske võistlus</title>
+</head>
+<body>
+    <p><a href="/">Tagasi avalehele</a></p>
+    <h2>Võistleja nr <%= playerInfo[0].participant_number %> tulemused</h2>
+    <hr>
+    <% playerInfo.forEach(function(resultInfo) { %>
+        <li>Kuupäev: <%= resultInfo.date %></li>
+        <li>Viskekaugus: <%= resultInfo.distance.toFixed(3) %> meetrit</li>
+        <br>
+    <% }) %>
+    
+</body>
+
+</html>

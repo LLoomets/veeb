@@ -20,20 +20,14 @@
         <br>
 
         <label for="throwDistanceInput">Viskekaugus (meetrites)</label>
-        <input type="number" step="0.01" name="throwDistanceInput" id="throwDistanceInput"  required>
+        <input type="number" step="0.001" name="throwDistanceInput" id="throwDistanceInput"  required>
         <br>
 
-        <input type="submit" name="throwSubmit" value="Lisa">
+        <input type="submit" name="throwSubmit" value="Salvesta">
     </form>
     <p><%= locals.notice || 'Ootel!' %></p>
-
-    <h2>Osalejate senised tulemused</h2>
     <hr>
-    <ul>
-        <% throwball.forEach(result => { %>
-            <li><%= result.date %> - <%= result.distance %> meetrit</li>
-        <% }); %>
-    </ul>
+
 </body>
 
 </html>
