@@ -7,6 +7,12 @@
 <body>
     <h1>Palliviske võistlused</h1>
     <hr>
+    <h2>Võistlejate kolm parimat tulemust</h2>
+    <ul>
+        <li>1. KOHT: võistleja nr <%= bestParticipants[0].participant_number %>, tulemus: <%= bestParticipants[0].best_result.toFixed(3) %> m.</li>
+        <li>2. KOHT: võistleja nr <%= bestParticipants[1].participant_number %>, tulemus: <%= bestParticipants[1].best_result.toFixed(3) %> m.</li>
+        <li>3. KOHT: võistleja nr <%= bestParticipants[2].participant_number %>, tulemus: <%= bestParticipants[2].best_result.toFixed(3) %> m.</li>
+    </ul>
 
     <h2>Lisa võistleja visketulemus</h2>
 

@@ -20,10 +20,6 @@ const bcrypt = require('bcrypt');
 //sessiooni jaoks
 const session = require('express-session');
 
-//pildi tüübi jaoks (jpeg, png, gif)
-//import fileType from 'file-type';
-
-
 app.use(session({secret: 'minuAbsoluutseltSalajaneVõti', saveUninitialized: true, resave: true}));
 let mySession;
 
@@ -31,8 +27,6 @@ app.set('view engine', 'ejs');
 app.use(express.static('public'));
 //Järgnev, kui ainult tekst, siis 'false', kui ka muud kraami nt pilti, siis'true'
 app.use(bodyparser.urlencoded({extended: true}));
-
-
 
 //loon andmebaasiühenduse
 //kui kõik db asjad pool'is, siis pole seda vaja
@@ -46,7 +40,24 @@ const conn = mysql.createConnection({
 
 app.get('/', (req, res)=>{
     //console.log('app gettis');
-    res.render('ballthrow');
+    notice = '';
+    let sql = 'SELECT participant_number, MAX(distance) AS best_result FROM competition GROUP BY participant_number ORDER BY best_result DESC LIMIT 3';
+    pool.getConnection((err, conn)=>{
+        if (err) {
+            throw err;
+            conn.release();
+        } else {
+            conn.execute(sql, (err, bestResult)=>{
+                if (err) {
+                    throw err;
+                    conn.release();
+                }
+                //notice = 'Parimad osalejad leitud';
+                res.render('ballthrow', {notice: notice, bestParticipants: bestResult});
+                conn.release();
+            });
+        }
+    });
 });
 
 app.post('/', (req, res) => {
