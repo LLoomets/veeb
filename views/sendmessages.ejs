@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Liisi Loomets, veebiprogrammeerimine 2023</title>
+
+	<style>
+		body {
+			background-color:gainsboro;
+		}
+		a, a:visited {
+			text-decoration: none;
+		}
+
+		a:hover, a:active {
+			text-decoration: underline;
+		}
+	</style>
+</head>
+
+<body>
+	<img src="/banner/banner.png" alt="Veebiprogrammeerimise kursuse bänner">
+	<br>
+	<img src="/banner/comp_24.png" alt="Arvuti24">
+	<h2>Saada sõnumeid</h2>
+	<p>(sõnumite saatmiseks ja nägemiseks logi sisse avalehel)</p>
+
+	<form action="/sendmessages" method="post">
+		<label for="receiver">Kellele soovid saata?</label>
+		<select name="receiver" id="receiver">
+			<% users.forEach(user => { %>
+			<option value="<%= user.id %>"><%= user.firstname %> <%= user.lastname %></option>
+			<% }); %>
+		</select>
+		<br>
+		<label for="message">Sõnumi sisu:</label>
+		<textarea name="message" id="message" rows="2" cols="50"></textarea>
+		<br>
+		<button type="submit">Saada</button>
+	</form>
+
+	<h2>Sisseloginud kasutajale saabunud sõnumid</h2>
+	<ul>
+		<% receivedMessages.forEach(message => { %>
+		  <li>
+			<%= message.content %> <%= message.is_read ? '(Loetud)' : '(Lugemata)' %>
+		  </li>
+		<% }); %>
+	</ul>
+	<hr>
+	<ul>
+		<li><p><a href="/">Avalehele</a></p></li>
+		<li><p><a href="/replymessage">Vastasõnumitele</a></p></li>
+	</ul>
+
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Liisi Loomets, veebiprogrammeerimine 2023</title>
+
+	<style>
+		body {
+			background-color:gainsboro;
+		}
+		a, a:visited {
+			text-decoration: none;
+		}
+
+		a:hover, a:active {
+			text-decoration: underline;
+		}
+	</style>
+</head>
+
+<body>
+	<img src="/banner/banner.png" alt="Veebiprogrammeerimise kursuse bänner"><br>
+	<img src="/banner/comp_24.png" alt="Arvuti24">
+	<h2>Vasta sõnumitele</h2>
+
+	<form action="/replymessage" method="post">
+		<label for="sender">Vali kellele vastad:</label>
+		<select name="sender" id="sender">
+			<% users.forEach(user => { %>
+				<option value="<%= user.id %>"><%= user.firstname %> <%= user.lastname %></option>
+			<% }); %>
+		</select>
+		<br>
+		<label for="reply">Vastus: </label>
+		<textarea name="reply" id="reply" rows="2" cols="50"></textarea>
+		<br>
+		<button type="submit">Saada</button>
+	</form>
+	<hr>
+	<ul>
+		<li><p><a href="/">Avalehele</a></p></li>
+		<li><p><a href="/sendmessages">Sõnumite saatmise lehele</a></p></li>
+
+	</ul>
+
+</body>
+</html>

@@ -50,13 +50,34 @@ app.use('/news', newsRouter);
 
 app.get('/', (req, res)=>{
     let notice = 'Sisesta oma kasutajakonto andmed!';
+    const getUnreadMessagesQuery = 'SELECT COUNT(id) AS unreadCount FROM vp_messages WHERE receiver_id = ? AND is_read = 0';
     //res.send('See töötab!');
     //res.download('index.js');
+    // if (req.session.userId) {
+    //     pool.getConnection((err, conn) => {
+    //         if (err) {
+    //             throw err;
+    //         } else {
+    //             conn.query(getUnreadMessagesQuery, [req.session.userId], (err, result) => {
+    //                 if (err) {
+    //                     console.error('Error fetching unread messages count:', err);
+    //                     conn.release();
+    //                     res.render('index', { notice, unreadCount: 0 }); // Pass unreadCount as 0 in case of an error
+    //                 } else {
+    //                     const unreadCount = result.length > 0 ? result[0].unreadCount : 0;
+    //                     conn.release();
+    //                     res.render('index', { notice, unreadCount });
+    //                 }
+    //             });
+    //         }
+    //     });
+    // }
     res.render('index', {notice: notice});
 });
 
 app.post('/', (req, res)=>{
     let notice = 'Sisesta oma kasutajakonto andmed!';
+    
 	if(!req.body.emailInput || !req.body.passwordInput){
 		console.log('Paha');
 		res.render('index', {notice: notice});
@@ -561,5 +582,111 @@ function checkLogin(req, res, next){
 		res.redirect('/');
 	}
 }
+
+app.get('/sendmessages', (req, res) => {
+    const userId = req.session.userId;
+    const getUsersQuery = 'SELECT id, firstname, lastname FROM vpusers';
+    const getReceivedMessagesQuery = 'SELECT id, content, is_read FROM vp_messages WHERE receiver_id = ?';
+
+    pool.getConnection((err, conn) => {
+        if (err) {
+            throw err;
+        } else {
+            conn.query(getUsersQuery, (err, users) => {
+                if (err) {
+                    console.error('Error:', err);
+                    users = [];
+                }
+                conn.query(getReceivedMessagesQuery, [userId], (err, receivedMessages) => {
+                    if (err) {
+                        console.error('Error:', err);
+                        receivedMessages = [];
+                    }
+                    conn.release();
+                    const markAsReadQuery = 'UPDATE vp_messages SET is_read = 1 WHERE receiver_id = ? AND is_read = 0';
+                    pool.query(markAsReadQuery, [userId], (err, result) => {
+                        if (err) {
+                            console.error('Error', err);
+                        }
+                        res.render('sendmessages', { users, receivedMessages });
+                    });
+                });
+            });
+        }
+    });
+});
+
+app.post('/sendmessages', (req, res) => {
+    let notice = '';
+    let sql = 'INSERT INTO vp_messages (sender_id, receiver_id, content) VALUES (?,?,?)';
+    const receiverId = req.body.receiver;
+    const messageContent = req.body.message;
+
+    if (receiverId !== undefined && messageContent !== undefined) {
+        pool.getConnection((err, conn) => {
+            if (err) {
+                throw err;
+            } else {
+                conn.execute(sql, [req.session.userId, receiverId, messageContent], (err, result) => {
+                    if (err) {
+                        console.log('Erros: ', err);
+                    }
+                    conn.release();
+                    res.redirect('/sendmessages');
+                });
+            }
+        });
+    } else {
+        console.log('error');
+        res.redirect('/sendmessages'); 
+    }
+});  
+
+app.get('/replymessage', (req, res) => {
+    const getUsersQuery = 'SELECT id, firstname, lastname FROM vpusers';
+
+    pool.getConnection((err, conn) => {
+        if (err) {
+            throw err;
+        } else {
+            conn.query(getUsersQuery, (err, users) => {
+                if (err) {
+                    console.error('Error:', err);
+                    users = [];
+                }
+                conn.release();
+                res.render('replymessage', { users });
+            });
+        }
+    });
+});
+
+app.post('/replymessage', (req, res) => {
+    const senderId = req.body.sender;
+    const replyContent = req.body.reply;
+
+    if (senderId !== undefined && replyContent !== undefined) {
+        const insertReplyQuery = 'INSERT INTO vp_messages (sender_id, receiver_id, content) VALUES (?, ?, ?)';
+
+        pool.getConnection((err, conn) => {
+            if (err) {
+                throw err;
+            } else {
+                conn.execute(insertReplyQuery, [req.session.userId, senderId, replyContent], (err, result) => {
+                    if (err) {
+                        console.log('Error: ', err);
+                    }
+                    conn.release();
+                    res.redirect('/replymessage'); 
+                });
+            }
+        });
+    } else {
+        console.log('Error');
+        res.redirect('/replymessage');
+    }
+});
+
+
 
 app.listen(5110);
